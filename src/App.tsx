@@ -612,8 +612,8 @@ const INIT_ATHLETES = [
   },
 ];
 
-// ── SHARED COMPONENTS ─────────────────────────────────────────────────────────
-function Toast({ msg, dark }) {
+/ ── SHARED COMPONENTS ─────────────────────────────────────────────────────────
+function Toast({ msg, dark }: { msg: string; dark?: boolean }) {
   return (
     <div
       style={{
