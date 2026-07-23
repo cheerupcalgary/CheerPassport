@@ -138,7 +138,7 @@ const INIT_ATHLETES = [
 ];
 
 // ── SHARED COMPONENTS ─────────────────────────────────────────────────────────
-function Toast({msg,dark}){
+function Toast({ msg, dark }: { msg: string; dark?: boolean }){
   return <div style={{position:"fixed",top:20,left:"50%",transform:"translateX(-50%)",background:dark?T.black:"#ffffff",color:dark?"#ffffff":T.black,fontFamily:F,fontWeight:700,fontSize:11,padding:"10px 22px",borderRadius:3,zIndex:10001,letterSpacing:2,border:`1px solid ${T.border2}`,whiteSpace:"nowrap",textTransform:"uppercase",boxShadow:"0 4px 20px rgba(0,0,0,0.12)"}}>{msg}</div>;
 }
 
