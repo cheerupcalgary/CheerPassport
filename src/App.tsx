@@ -1,5 +1,52 @@
 import React, { useState } from "react";
 
+// ── TYPES ─────────────────────────────────────────────────────────────────────
+type Athlete = {
+  id: string;
+  name: string;
+  team: string;
+  level: number;
+  points: number;
+  gym: string;
+  reportCards?: any[];
+};
+
+type User = {
+  name: string;
+  role: string;
+  gym?: string;
+};
+
+type Team = {
+  id: string;
+  name: string;
+  level: string;
+  ageGroup: string;
+  schedule: string;
+  coachName: string;
+};
+
+type ShopItem = {
+  id: string;
+  name: string;
+  cost: number;
+  icon: string;
+  stock: number;
+  desc: string;
+  imageUrl: string;
+};
+
+type Order = {
+  id: string;
+  itemName: string;
+  athleteName: string;
+  athleteTeam: string;
+  cost: number;
+  status: string;
+  orderedDate: string;
+  icon?: string;
+};
+
 // ── THEME & STYLES ────────────────────────────────────────────────────────────
 const F = "sans-serif";
 const FC = "sans-serif";
@@ -15,7 +62,7 @@ const T = {
   s2: "#f0f0f0",
 };
 
-const inpS = {
+const inpS: React.CSSProperties = {
   width: "100%",
   padding: "8px 10px",
   border: `1px solid ${T.border}`,
@@ -28,7 +75,7 @@ const inpS = {
 
 const inp = () => inpS;
 
-// ── INITIAL DUMMY DATA ────────────────────────────────────────────────────────
+// ── INITIAL DATA ──────────────────────────────────────────────────────────────
 const SPIRIT_SOFT = [
   { id: "sp1", name: "Team Player", desc: "Encouraging teammates during practice", pts: 25, icon: "★" },
   { id: "sp2", name: "Hardest Worker", desc: "Pushed through a tough workout", pts: 50, icon: "🔥" },
@@ -36,45 +83,45 @@ const SPIRIT_SOFT = [
 
 const REPORT_CATS = ["Stunting", "Tumbling", "Jumps", "Dance", "Work Ethic"];
 
-const INIT_ATHLETES = [
+const INIT_ATHLETES: Athlete[] = [
   { id: "a1", name: "Ava Smith", team: "Senior Elite", level: 5, points: 450, gym: "Dynasty Athletics", reportCards: [] },
   { id: "a2", name: "Mia Johnson", team: "Junior Coed", level: 3, points: 280, gym: "Dynasty Athletics", reportCards: [] },
 ];
 
-const GYM_CONFIGS = {
+const GYM_CONFIGS: Record<string, { primary: string; secondary: string; name: string; contactEmail: string }> = {
   "Dynasty Athletics": { primary: "#111111", secondary: "#f0c040", name: "Dynasty Athletics", contactEmail: "info@dynasty.com" },
 };
 
-// ── PRIMITIVE UI COMPONENTS ───────────────────────────────────────────────────
-const Title = ({ children, accent }) => (
+// ── PRIMITIVE UI COMPONENTS (TYPED) ───────────────────────────────────────────
+const Title: React.FC<{ children: React.ReactNode; accent?: string }> = ({ children, accent }) => (
   <h2 style={{ fontFamily: FC, fontSize: 22, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4, color: accent || T.black }}>
     {children}
   </h2>
 );
 
-const Sub = ({ children }) => (
+const Sub: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <p style={{ fontFamily: F, fontSize: 12, color: T.faint, marginBottom: 16 }}>{children}</p>
 );
 
-const Lbl = ({ children }) => (
+const Lbl: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <label style={{ display: "block", fontFamily: F, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: T.dark, marginBottom: 6 }}>
     {children}
   </label>
 );
 
-const Card = ({ children, style }) => (
+const Card: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
   <div style={{ border: `1px solid ${T.border}`, borderRadius: 4, padding: 16, background: "#ffffff", ...style }}>
     {children}
   </div>
 );
 
-const Toast = ({ msg, dark }) => (
+const Toast: React.FC<{ msg: string; dark?: boolean }> = ({ msg, dark }) => (
   <div style={{ position: "fixed", bottom: 20, right: 20, background: dark ? "#111" : "#333", color: "#fff", padding: "10px 18px", borderRadius: 4, fontFamily: F, fontSize: 12, zIndex: 9999 }}>
     {msg}
   </div>
 );
 
-const GymBand = ({ gymName, onLogout, userRole }) => (
+const GymBand: React.FC<{ gymName: string; onLogout: () => void; userRole: string }> = ({ gymName, onLogout, userRole }) => (
   <div style={{ background: "#111111", color: "#ffffff", padding: "12px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
     <div style={{ fontFamily: FC, fontSize: 16, fontWeight: 800, textTransform: "uppercase" }}>{gymName}</div>
     <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
@@ -84,14 +131,14 @@ const GymBand = ({ gymName, onLogout, userRole }) => (
   </div>
 );
 
-const ShopView = () => (
+const ShopView: React.FC<{ gymName?: string; editable?: boolean; accentColor?: string; shopItems?: ShopItem[]; setShopItems?: React.Dispatch<React.SetStateAction<ShopItem[]>> }> = () => (
   <Card style={{ marginBottom: 16 }}>
     <Title>Pro Shop</Title>
     <Sub>Reward items available for purchase with points.</Sub>
   </Card>
 );
 
-const LoginScreen = ({ onLogin }) => (
+const LoginScreen: React.FC<{ onLogin: (u: User) => void }> = ({ onLogin }) => (
   <div style={{ padding: 40, textAlign: "center", fontFamily: F }}>
     <Title>Cheer Passport Login</Title>
     <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: 20 }}>
@@ -101,7 +148,7 @@ const LoginScreen = ({ onLogin }) => (
   </div>
 );
 
-const AthleteView = ({ user, onLogout }) => (
+const AthleteView: React.FC<{ user: User; athletes: Athlete[]; setAthletes: any; shopItems: ShopItem[]; setShopItems: any; orders: Order[]; setOrders: any; onLogout: () => void }> = ({ user, onLogout }) => (
   <div style={{ padding: 20, fontFamily: F }}>
     <GymBand gymName={user.gym || "Gym"} onLogout={onLogout} userRole="Athlete / Parent" />
     <div style={{ padding: 20 }}><Title>Welcome, {user.name}</Title></div>
@@ -109,49 +156,65 @@ const AthleteView = ({ user, onLogout }) => (
 );
 
 // ── COACH VIEW COMPONENT ──────────────────────────────────────────────────────
-function CoachView({ user, athletes, setAthletes, shopItems, setShopItems, orders, setOrders, onLogout }) {
-  const isOwner = user.role === "owner";
-  const ac = GYM_CONFIGS[user.gym]?.secondary || "#f0c040";
+interface CoachViewProps {
+  user: User;
+  athletes: Athlete[];
+  setAthletes: React.Dispatch<React.SetStateAction<Athlete[]>>;
+  shopItems: ShopItem[];
+  setShopItems: React.Dispatch<React.SetStateAction<ShopItem[]>>;
+  orders: Order[];
+  setOrders: React.Dispatch<React.SetStateAction<Order[]>>;
+  onLogout: () => void;
+}
 
-  const [tab, setTab] = useState("spirit");
-  const [actLog, setActLog] = useState([]);
-  const [toast, setToast] = useState(null);
-  const [selA, setSelA] = useState(athletes[0] || null);
+function CoachView({ user, athletes, setAthletes, shopItems, setShopItems, orders, setOrders, onLogout }: CoachViewProps) {
+  const isOwner = user.role === "owner";
+  const ac = user.gym && GYM_CONFIGS[user.gym]?.secondary ? GYM_CONFIGS[user.gym].secondary : "#f0c040";
+
+  const [tab, setTab] = useState<string>("spirit");
+  const [actLog, setActLog] = useState<any[]>([]);
+  const [toast, setToast] = useState<{ msg: string; dark?: boolean } | null>(null);
+  const [selA, setSelA] = useState<Athlete | null>(athletes[0] || null);
 
   // Form & Component States
   const [showRc, setShowRc] = useState(false);
-  const [rcForm, setRcForm] = useState({ period: "", comments: "", goals: "", ratings: REPORT_CATS.reduce((acc, cat) => ({ ...acc, [cat]: 5 }), {}) });
-  const [teams, setTeams] = useState([
+  const [rcForm, setRcForm] = useState({
+    period: "",
+    comments: "",
+    goals: "",
+    ratings: REPORT_CATS.reduce((acc, cat) => ({ ...acc, [cat]: 5 }), {} as Record<string, number>)
+  });
+  const [teams, setTeams] = useState<Team[]>([
     { id: "t1", name: "Senior Elite", level: "5", ageGroup: "Senior (14+)", schedule: "Mon/Wed/Fri 4-6pm", coachName: "Coach Sarah" },
     { id: "t2", name: "Junior Coed", level: "3", ageGroup: "Junior (9-14)", schedule: "Tue/Thu 5-7pm", coachName: "Coach Alex" }
   ]);
   const [showTeamForm, setShowTeamForm] = useState(false);
-  const [editTeamId, setEditTeamId] = useState(null);
+  const [editTeamId, setEditTeamId] = useState<string | null>(null);
   const [teamForm, setTeamForm] = useState({ name: "", level: "", ageGroup: "", schedule: "", coachName: "" });
   const [assignForm, setAssignForm] = useState({ athleteId: "", teamId: "" });
   const [ptAdj, setPtAdj] = useState({ amount: "", reason: "" });
-  const [gymSettings, setGymSettings] = useState({ name: user.gym, primary: "#111111", secondary: ac, contactEmail: "admin@gym.com" });
+  const [gymSettings, setGymSettings] = useState({ name: user.gym || "", primary: "#111111", secondary: ac, contactEmail: "admin@gym.com" });
 
-  const [csvError, setCsvError] = useState(null);
-  const [importResult, setImportResult] = useState(null);
-  const [csvPreview, setCsvPreview] = useState(null);
+  const [csvError] = useState<string | null>(null);
+  const [importResult] = useState<any | null>(null);
+  const [csvPreview, setCsvPreview] = useState<any[] | null>(null);
 
-  const notify = (msg, dark = false) => {
+  const notify = (msg: string, dark = false) => {
     setToast({ msg, dark });
     setTimeout(() => setToast(null), 2200);
   };
 
   const visibleAthletes = athletes.filter(a => a.gym === user.gym);
 
-  const ABt = ({ a }) => (
+  const ABt: React.FC<{ a: Athlete }> = ({ a }) => (
     <button onClick={() => setSelA(a)} style={{ background: selA?.id === a.id ? "#111" : T.s1, color: selA?.id === a.id ? "#fff" : T.black, border: `1px solid ${T.border}`, padding: "6px 12px", borderRadius: 3, cursor: "pointer", fontFamily: F, fontSize: 11, fontWeight: 600 }}>
       {a.name}
     </button>
   );
 
-  const awardSkill = (sk, lv) => { notify(`Skill awarded: ${sk}`); };
-  const removeSkill = (sk) => { notify(`Skill removed: ${sk}`); };
-  const awardSpirit = (sp) => {
+  const awardSkill = (sk: string, lv: string) => { notify(`Skill awarded: ${sk}`); };
+  const removeSkill = (sk: string) => { notify(`Skill removed: ${sk}`); };
+  const awardSpirit = (sp: { id: string; name: string; pts: number }) => {
     if (!selA) return notify("Select an athlete first");
     setAthletes(prev => prev.map(a => a.id === selA.id ? { ...a, points: a.points + sp.pts } : a));
     setActLog(prev => [{ athlete: selA.name, type: `Spirit: ${sp.name}`, pts: sp.pts, time: "Just now" }, ...prev]);
@@ -166,17 +229,18 @@ function CoachView({ user, athletes, setAthletes, shopItems, setShopItems, order
     notify(`Report Card published for ${selA.name}`, true);
   };
 
-  const handleCsvUpload = () => { notify("CSV import triggered"); };
+  const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => { notify("CSV import triggered"); };
   const importCsvRoster = () => { notify("Roster imported"); setCsvPreview(null); };
 
   const assignAthlete = () => {
     if (!assignForm.athleteId || !assignForm.teamId) return notify("Select athlete and team");
     const teamObj = teams.find(t => t.id === assignForm.teamId);
+    if (!teamObj) return;
     setAthletes(prev => prev.map(a => a.id === assignForm.athleteId ? { ...a, team: teamObj.name } : a));
     notify("Athlete assigned to team", true);
   };
 
-  const startEditTeam = (t) => { setEditTeamId(t.id); setTeamForm(t); setShowTeamForm(true); };
+  const startEditTeam = (t: Team) => { setEditTeamId(t.id); setTeamForm(t); setShowTeamForm(true); };
   const saveTeam = () => {
     if (editTeamId) {
       setTeams(prev => prev.map(t => t.id === editTeamId ? { ...teamForm, id: editTeamId } : t));
@@ -187,9 +251,9 @@ function CoachView({ user, athletes, setAthletes, shopItems, setShopItems, order
     setEditTeamId(null);
     notify("Team saved", true);
   };
-  const deleteTeam = (id) => { setTeams(prev => prev.filter(t => t.id !== id)); notify("Team deleted"); };
+  const deleteTeam = (id: string) => { setTeams(prev => prev.filter(t => t.id !== id)); notify("Team deleted"); };
 
-  const adjustPts = (type) => {
+  const adjustPts = (type: "add" | "remove") => {
     if (!selA || !ptAdj.amount) return;
     const amount = parseInt(ptAdj.amount, 10) * (type === "remove" ? -1 : 1);
     setAthletes(prev => prev.map(a => a.id === selA.id ? { ...a, points: a.points + amount } : a));
@@ -202,11 +266,11 @@ function CoachView({ user, athletes, setAthletes, shopItems, setShopItems, order
     <div style={{ minHeight: "100vh", background: "#ffffff", color: T.black, fontFamily: F }}>
       <style>{GS}</style>
       {toast && <Toast {...toast} />}
-      <GymBand gymName={user.gym} onLogout={onLogout} userRole={isOwner ? "Owner / Head Coach" : "Coach"} />
+      <GymBand gymName={user.gym || "Gym"} onLogout={onLogout} userRole={isOwner ? "Owner / Head Coach" : "Coach"} />
 
       {/* NAVIGATION TABS */}
       <div style={{ display: "flex", gap: 8, padding: "12px 18px", borderBottom: `1px solid ${T.border}`, overflowX: "auto", background: T.s1 }}>
-        {["spirit", "skills", "report", "activity", isOwner && "teams", isOwner && "points", isOwner && "shop", isOwner && "fulfillment", isOwner && "access", isOwner && "settings"].filter(Boolean).map(t => (
+        {(["spirit", "skills", "report", "activity", isOwner && "teams", isOwner && "points", isOwner && "shop", isOwner && "fulfillment", isOwner && "access", isOwner && "settings"].filter(Boolean) as string[]).map(t => (
           <button key={t} onClick={() => setTab(t)} style={{ background: tab === t ? "#111" : "transparent", color: tab === t ? "#fff" : T.dark, border: "none", padding: "6px 12px", borderRadius: 3, cursor: "pointer", fontFamily: F, fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1 }}>
             {t}
           </button>
@@ -286,7 +350,7 @@ function CoachView({ user, athletes, setAthletes, shopItems, setShopItems, order
                   {REPORT_CATS.map(cat => (
                     <div key={cat}>
                       <div style={{ fontFamily: F, fontSize: 11, fontWeight: 600, marginBottom: 4 }}>{cat}</div>
-                      <select value={rcForm.ratings[cat]} onChange={e => setRcForm(p => ({ ...p, ratings: { ...p.ratings, [cat]: parseInt(e.target.value) } }))} style={{ ...inpS, padding: "6px 10px" }}>
+                      <select value={rcForm.ratings[cat]} onChange={e => setRcForm(p => ({ ...p, ratings: { ...p.ratings, [cat]: parseInt(e.target.value, 10) } }))} style={{ ...inpS, padding: "6px 10px" }}>
                         {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n} ★</option>)}
                       </select>
                     </div>
@@ -298,7 +362,7 @@ function CoachView({ user, athletes, setAthletes, shopItems, setShopItems, order
               </div>
             )}
           </Card>}
-          {selA?.reportCards?.length > 0 && <>
+          {selA?.reportCards && selA.reportCards.length > 0 && <>
             <Lbl>Issued Reports for {selA.name}</Lbl>
             {selA.reportCards.map((rc, i) => (
               <div key={i} style={{ border: `1px solid ${T.border}`, borderRadius: 4, padding: 14, marginBottom: 10, background: T.s1 }}>
@@ -308,7 +372,7 @@ function CoachView({ user, athletes, setAthletes, shopItems, setShopItems, order
                     <div style={{ fontFamily: F, fontSize: 10, color: T.faint, marginTop: 2 }}>By {rc.publishedBy}</div>
                   </div>
                   <span style={{ fontFamily: FC, fontSize: 16, fontWeight: 800, color: ac }}>
-                    {(Object.values(rc.ratings).reduce((a, b) => a + b, 0) / REPORT_CATS.length).toFixed(1)} / 5 ★
+                    {(Object.values(rc.ratings as Record<string, number>).reduce((a, b) => a + b, 0) / REPORT_CATS.length).toFixed(1)} / 5 ★
                   </span>
                 </div>
               </div>
@@ -483,7 +547,7 @@ function CoachView({ user, athletes, setAthletes, shopItems, setShopItems, order
           <Card style={{ marginBottom: 16 }}>
             <Lbl>Coach Invite Code</Lbl>
             <div style={{ fontFamily: FC, fontSize: 22, fontWeight: 800, letterSpacing: 2, background: T.s1, padding: "10px 14px", borderRadius: 3, marginBottom: 8, userSelect: "all" }}>
-              {user.gym.includes("Dynasty") ? "DYNASTY-COACH-2026" : "UOFC-COACH-2026"}
+              {user.gym && user.gym.includes("Dynasty") ? "DYNASTY-COACH-2026" : "UOFC-COACH-2026"}
             </div>
             <div style={{ fontFamily: F, fontSize: 11, color: T.faint, lineHeight: 1.5 }}>Coaches use this code on the "Coach Register" screen to create an account. Once registered, assign them to teams in <strong>Teams & Roster</strong>.</div>
           </Card>
@@ -504,7 +568,7 @@ function CoachView({ user, athletes, setAthletes, shopItems, setShopItems, order
               <div><Lbl>Secondary Color (Hex / RGB)</Lbl><input value={gymSettings.secondary} onChange={e => setGymSettings(p => ({ ...p, secondary: e.target.value }))} style={inpS} /></div>
             </div>
             <button onClick={() => {
-              if (GYM_CONFIGS[user.gym]) {
+              if (user.gym && GYM_CONFIGS[user.gym]) {
                 GYM_CONFIGS[user.gym].primary = gymSettings.primary;
                 GYM_CONFIGS[user.gym].secondary = gymSettings.secondary;
                 GYM_CONFIGS[user.gym].name = gymSettings.name;
@@ -521,11 +585,11 @@ function CoachView({ user, athletes, setAthletes, shopItems, setShopItems, order
 }
 
 // ── PLATFORM ADMIN VIEW ───────────────────────────────────────────────────────
-function AdminView({ user, athletes, onLogout }) {
+function AdminView({ user, athletes, onLogout }: { user: User; athletes: Athlete[]; onLogout: () => void }) {
   const [gyms, setGyms] = useState(Object.keys(GYM_CONFIGS));
   const [newGym, setNewGym] = useState({ name: "", primary: "#1a1a1a", secondary: "#888888", email: "" });
-  const [toast, setToast] = useState(null);
-  const notify = (msg, dark = false) => { setToast({ msg, dark }); setTimeout(() => setToast(null), 2200); };
+  const [toast, setToast] = useState<{ msg: string; dark?: boolean } | null>(null);
+  const notify = (msg: string, dark = false) => { setToast({ msg, dark }); setTimeout(() => setToast(null), 2200); };
 
   const addGym = () => {
     if (!newGym.name.trim()) { notify("Gym name required"); return; }
@@ -580,9 +644,9 @@ function AdminView({ user, athletes, onLogout }) {
 
 // ── MAIN APPLICATION ENTRY ───────────────────────────────────────────────────
 export default function App() {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [athletes, setAthletes] = useState(INIT_ATHLETES);
-  const [shopItems, setShopItems] = useState([
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [athletes, setAthletes] = useState<Athlete[]>(INIT_ATHLETES);
+  const [shopItems, setShopItems] = useState<ShopItem[]>([
     { id: "sh1", name: "Passport Sticker Pack", cost: 50, icon: "✦", stock: 99, desc: "Exclusive stickers for your passport", imageUrl: "" },
     { id: "sh2", name: "Gym Water Bottle", cost: 150, icon: "◈", stock: 12, desc: "Custom branded water bottle", imageUrl: "" },
     { id: "sh3", name: "Custom Hair Bow", cost: 200, icon: "◇", stock: 8, desc: "Team colour hair bow", imageUrl: "" },
@@ -590,7 +654,7 @@ export default function App() {
     { id: "sh5", name: "Personalized Bag Tag", cost: 75, icon: "○", stock: 20, desc: "Custom bag tag", imageUrl: "" },
     { id: "sh6", name: "Gold Trophy", cost: 1000, icon: "★", stock: 3, desc: "Season champion trophy", imageUrl: "" },
   ]);
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<Order[]>([]);
 
   if (!currentUser) {
     return <LoginScreen onLogin={setCurrentUser} />;
